@@ -121,6 +121,7 @@ async def select_report_store_info_redux(store_business_id: str, request: Reques
         raise HTTPException(status_code=500, detail=error_msg)
 
 
+# 기본 정보 + 장사지수 + 날씨 + 미세먼지 + GPT
 @router.get("/store/info", response_model=LocalStoreInfoWeaterInfoOutput)
 def select_report_store_info(store_business_id: str):
     # logger.info(
