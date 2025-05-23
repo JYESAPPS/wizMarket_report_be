@@ -337,11 +337,11 @@ def select_loc_info_j_scorereport_data(store_business_id: str):
         # logger.info(f"local_store_loc_info_data: {local_store_loc_info_data}")
 
         # GPT ###########################################################################
-        # report_advice: GPTAnswer = (
-        #     service_get_loc_info_gpt_answer_by_local_store_loc_info(
-        #         local_store_loc_info_data
-        #     )
-        # )
+        report_advice: GPTAnswer = (
+            service_get_loc_info_gpt_answer_by_local_store_loc_info(
+               local_store_loc_info_data
+            )
+        )
         # GPT ###########################################################################
         report_dummy = """Dummy Data
                                 결론
@@ -351,8 +351,8 @@ def select_loc_info_j_scorereport_data(store_business_id: str):
 
         result = LocalStoreLocInfoJscoreDataOutput(
             local_store_loc_info_j_score_data=local_store_loc_info_data,
-            # loc_info_advice=report_advice.gpt_answer,
-            loc_info_advice=report_dummy,
+            loc_info_advice=report_advice.gpt_answer,
+            # loc_info_advice=report_dummy,
         )
 
         return result
