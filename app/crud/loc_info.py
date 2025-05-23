@@ -93,6 +93,7 @@ def select_loc_info_j_score_by_store_business_number(
                         LOC_INFO_AVERAGE_SALES_K,
                         LOC_INFO_AVERAGE_SPEND_K,
                         LOC_INFO_HOUSE_K,
+                        LOC_INFO_WORK_POP_K,
 
                         LOC_INFO_MZ_POPULATION_J_SCORE,
                         LOC_INFO_SHOP_J_SCORE,
@@ -102,6 +103,7 @@ def select_loc_info_j_score_by_store_business_number(
                         LOC_INFO_INCOME_J_SCORE,
                         LOC_INFO_AVERAGE_SPEND_J_SCORE,
                         LOC_INFO_AVERAGE_SALES_J_SCORE,
+                        LOC_INFO_WORK_POP_J_SCORE,
                         POPULATION_TOTAL,
                         POPULATION_MALE_PERCENT,
                         POPULATION_FEMALE_PERCENT,
@@ -140,6 +142,7 @@ def select_loc_info_j_score_by_store_business_number(
                     loc_info_resident_k=row["LOC_INFO_RESIDENT_K"],
                     loc_info_move_pop_k=row["LOC_INFO_MOVE_POP_K"],
                     loc_info_shop_k=row["LOC_INFO_SHOP_K"],
+                    loc_info_work_pop_k=row["LOC_INFO_WORK_POP_K"],
                     loc_info_income_won=row["LOC_INFO_INCOME_WON"],
                     loc_info_average_sales_k=row["LOC_INFO_AVERAGE_SALES_K"],
                     loc_info_average_spend_k=row["LOC_INFO_AVERAGE_SPEND_K"],
@@ -158,6 +161,9 @@ def select_loc_info_j_score_by_store_business_number(
                     ),
                     loc_info_house_j_score=round(
                         row.get("LOC_INFO_HOUSE_J_SCORE", 0) or 0, 1
+                    ),
+                    loc_info_work_pop_j_score=round(
+                        row.get("LOC_INFO_WORK_POP_J_SCORE", 0) or 0, 1
                     ),
                     loc_info_income_j_score=round(
                         row.get("LOC_INFO_INCOME_J_SCORE", 0) or 0, 1

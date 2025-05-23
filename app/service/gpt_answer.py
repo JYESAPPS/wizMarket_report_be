@@ -279,14 +279,14 @@ def get_loc_info_gpt_answer_by_local_store_loc_info(
             - 위치 : {region_name}
             - 업종 : {loc_data.detail_category_name}
             - 매장이름 : {loc_data.store_name}
-            - 화양동 주거인구 수 : {loc_data.loc_info_resident_k * 1000 if loc_data.loc_info_resident_k is not None else "-"} / {loc_data.loc_info_resident_j_score if loc_data.loc_info_resident_j_score is not None else "-"}점
-            - 화양동 유동인구 수 : {loc_data.loc_info_move_pop_k * 1000 if loc_data.loc_info_move_pop_k is not None else "-"} / {loc_data.loc_info_move_pop_j_score if loc_data.loc_info_move_pop_j_score is not None else "-"}점
-            - 화양동 업소수 : {loc_data.loc_info_shop_k * 1000 if loc_data.loc_info_shop_k is not None else "-"} / {loc_data.loc_info_shop_j_score if loc_data.loc_info_shop_j_score is not None else "-"}점
-            - 화양동 지역 평균매출 : {loc_data.loc_info_average_sales_k * 1000 if loc_data.loc_info_average_sales_k is not None else "-"} / {loc_data.loc_info_average_sales_j_score if loc_data.loc_info_average_sales_j_score is not None else "-"}점
-            - 화양동 월 평균소비 : {loc_data.loc_info_average_spend_k * 1000 if loc_data.loc_info_average_spend_k is not None else "-"} / {loc_data.loc_info_average_spend_j_score if loc_data.loc_info_average_spend_j_score is not None else "-"}점
-            - 화양동 월 평균소득 : {loc_data.loc_info_income_won * 10000 if loc_data.loc_info_income_won is not None else "-"} / {loc_data.loc_info_income_j_score if loc_data.loc_info_income_j_score is not None else "-"}점
-            - 화양동 세대 수 : {loc_data.loc_info_house_k * 1000 if loc_data.loc_info_house_k is not None else "-"} / {loc_data.loc_info_house_j_score if loc_data.loc_info_house_j_score is not None else "-"}점
-            - 화양동 인구 분포 : 10세미만 {loc_data.population_age_10_under}명, 10대 {loc_data.population_age_10s}명, 20대 {loc_data.population_age_20s}명, 30대 {loc_data.population_age_30s}명, 40대 {loc_data.population_age_40s}명, 50대 {loc_data.population_age_50s}명, 60대 {loc_data.population_age_60_over}명, 여성 {round(loc_data.population_female_percent, 1) or 0}% , 남성 {round(loc_data.population_male_percent, 1) or 0}% 
+            - 주거인구 수 : {loc_data.loc_info_resident_k * 1000 if loc_data.loc_info_resident_k is not None else "-"} / {loc_data.loc_info_resident_j_score if loc_data.loc_info_resident_j_score is not None else "-"}점
+            - 유동인구 수 : {loc_data.loc_info_move_pop_k * 1000 if loc_data.loc_info_move_pop_k is not None else "-"} / {loc_data.loc_info_move_pop_j_score if loc_data.loc_info_move_pop_j_score is not None else "-"}점
+            - 업소수 : {loc_data.loc_info_shop_k * 1000 if loc_data.loc_info_shop_k is not None else "-"} / {loc_data.loc_info_shop_j_score if loc_data.loc_info_shop_j_score is not None else "-"}점
+            - 지역 평균매출 : {loc_data.loc_info_average_sales_k * 1000 if loc_data.loc_info_average_sales_k is not None else "-"} / {loc_data.loc_info_average_sales_j_score if loc_data.loc_info_average_sales_j_score is not None else "-"}점
+            - 월 평균소비 : {loc_data.loc_info_average_spend_k * 1000 if loc_data.loc_info_average_spend_k is not None else "-"} / {loc_data.loc_info_average_spend_j_score if loc_data.loc_info_average_spend_j_score is not None else "-"}점
+            - 월 평균소득 : {loc_data.loc_info_income_won * 10000 if loc_data.loc_info_income_won is not None else "-"} / {loc_data.loc_info_income_j_score if loc_data.loc_info_income_j_score is not None else "-"}점
+            - 세대 수 : {loc_data.loc_info_house_k * 1000 if loc_data.loc_info_house_k is not None else "-"} / {loc_data.loc_info_house_j_score if loc_data.loc_info_house_j_score is not None else "-"}점
+            - 인구 분포 : 10세미만 {loc_data.population_age_10_under}명, 10대 {loc_data.population_age_10s}명, 20대 {loc_data.population_age_20s}명, 30대 {loc_data.population_age_30s}명, 40대 {loc_data.population_age_40s}명, 50대 {loc_data.population_age_50s}명, 60대 {loc_data.population_age_60_over}명, 여성 {round(loc_data.population_female_percent, 1) or 0}% , 남성 {round(loc_data.population_male_percent, 1) or 0}% 
 
         """
         client = OpenAI(api_key=os.getenv("GPT_KEY"))

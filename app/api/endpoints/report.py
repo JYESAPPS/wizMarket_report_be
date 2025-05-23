@@ -32,6 +32,7 @@ from app.schemas.report import (
     LocalStoreTop5MenuAdviceOutput,
     WeatherInfo,
     GPTAnswer,
+    LocalStoreLocInfoJscoreDataOutputWithGPT
 )
 from app.service.local_store_basic_info import (
     get_road_event_info_by_lat_lng,
@@ -272,6 +273,57 @@ def select_all_report_common_information():
         logger.error(error_msg)
         raise HTTPException(status_code=500, detail=error_msg)
 
+
+@router.get("/population", response_model=LocalStoreLocInfoJscoreDataOutputWithGPT)
+def select_population_data(store_business_id: str):
+    try:
+
+        local_store_loc_info_data: LocalStoreLocInfoJscoreData = (
+            service_select_loc_info_j_score_by_store_business_number(store_business_id)
+        )
+        
+        report_advice: GPTAnswer = (
+            service_get_loc_info_gpt_answer_by_local_store_loc_info(
+               local_store_loc_info_data
+            )
+        )
+
+        result = LocalStoreLocInfoJscoreDataOutputWithGPT(
+            local_store_loc_info_j_score_data=local_store_loc_info_data,
+            loc_info_advice=report_advice.gpt_answer,
+            # loc_info_advice=report_dummy,
+        )
+
+        return result
+
+        # GPT ###########################################################################
+        # report_advice = service_get_rising_business_gpt_answer_by_local_store_top5_menu(rising_menu_top5) # GPT API
+        # logger.info(f"report_advice: {report_advice}")
+        # GPT ###########################################################################
+
+        report_dummy = """
+                        Dummy Data
+                        삼겹살이랑 돼지갈비가 인기가 많으니까,
+                        그 두 가지를 묶어서 세트 메뉴로 한번 내봐유.
+                        금요일엔 사람들이 술도 많이 먹으니까 병맥주나
+                        소주 할인 이벤트 하나 해주면 딱 좋을 거여.
+                        된장찌개는 그냥 기본으로 맛있게 준비해주면 손님들 만족도가 더 높아질 거유!
+                        """
+
+        result = LocalStoreTop5MenuAdviceOutput(
+            local_store_top5_orderd_menu=rising_menu_top5,
+            # rising_menu_advice=report_advice.gpt_answer, # GPT API
+            rising_menu_advice=report_dummy,  # Dummy
+        )
+
+    except HTTPException as http_ex:
+        logger.error(f"HTTP error occurred: {http_ex.detail}")
+        raise http_ex
+
+    except Exception as e:
+        error_msg = f"Unexpected error while processing request: {str(e)}"
+        logger.error(error_msg)
+        raise HTTPException(status_code=500, detail=error_msg)
 
 @router.get("/population", response_model=LocalStorePopulationDataOutPut)
 def select_population_data(store_business_id: str):

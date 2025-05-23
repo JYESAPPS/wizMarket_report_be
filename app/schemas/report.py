@@ -392,6 +392,7 @@ class LocalStoreLocInfoJscoreData(BaseModel):
     loc_info_average_sales_k: Optional[float] = None
     loc_info_average_spend_k: Optional[float] = None
     loc_info_house_k: Optional[float] = None
+    loc_info_work_pop_k: Optional[float] = None
 
     loc_info_resident_j_score: Optional[float] = None
     loc_info_move_pop_j_score: Optional[float] = None
@@ -400,6 +401,7 @@ class LocalStoreLocInfoJscoreData(BaseModel):
     loc_info_average_spend_j_score: Optional[float] = None
     loc_info_average_sales_j_score: Optional[float] = None
     loc_info_house_j_score: Optional[float] = None
+    loc_info_work_pop_j_score: Optional[float] = None
     population_mz_population_j_score: Optional[float] = None
 
     population_total: Optional[int] = None
@@ -474,6 +476,14 @@ class LocalStoreLocInfoJscoreData(BaseModel):
 
 
 class LocalStoreLocInfoJscoreDataOutput(BaseModel):
+    local_store_loc_info_j_score_data: LocalStoreLocInfoJscoreData
+    loc_info_advice: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class LocalStoreLocInfoJscoreDataOutputWithGPT(BaseModel):
     local_store_loc_info_j_score_data: LocalStoreLocInfoJscoreData
     loc_info_advice: Optional[str] = None
 
