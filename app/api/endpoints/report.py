@@ -288,9 +288,17 @@ def select_population_data(store_business_id: str):
             )
         )
 
+        population_advice: GPTAnswer = (
+            service_get_commercial_district_gpt_answer_by_cd_j_score_average(
+               local_store_loc_info_data
+            )
+
+        )
+
         result = LocalStoreLocInfoJscoreDataOutputWithGPT(
             local_store_loc_info_j_score_data=local_store_loc_info_data,
             loc_info_advice=report_advice.gpt_answer,
+            population_advice=population_advice.gpt_answer,
             # loc_info_advice=report_dummy,
         )
 

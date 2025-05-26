@@ -266,6 +266,10 @@ def get_loc_info_gpt_answer_by_local_store_loc_info(
     loc_data=LocalStoreLocInfoJscoreData,
 ) -> GPTAnswer:
     try:
+        gpt_role = """
+            다음과 같은 매장정보 입지 현황을 바탕으로 매장 입지 특징을 분석하시고 입지에 따른 매장운영 가이드를 제시해주세요. 
+            각 항목의 점수는 전체 지역 대비 순위를 나타낸것으로 0~10점으로 구성됩니다.
+        """
         region_name = f"{loc_data.city_name} {loc_data.district_name} {loc_data.sub_district_name}"
 
         content = f"""
@@ -317,20 +321,46 @@ def get_loc_info_gpt_answer_by_local_store_loc_info(
 
 
 # 인구 연령별 특성 및 응대방법 GPT
-def get_commercial_district_gpt_answer_by_cd_j_score_average(
-    cd_data=LocalStoreCommercialDistrictJscoreAverage,
-) -> GPTAnswer:
+def get_commercial_district_gpt_answer_by_cd_j_score_average(cd_data=LocalStoreLocInfoJscoreData) -> GPTAnswer:
     try:
+        gpt_role = """
+            위 매장이 위치하는 곳의 업종, 업소수, 평균매출, 평균소득, 평균소비, 유동인구를 분석하고 인구분포를 파악하여 매장에 대한 연령별 특성 및 매출을 높이기 위한 고객 응대방법은 무엇이 있겠습니까? 
+            100자 이상, 200자 이하로 개조식으로 작성해주세요.
+            """
+        # 1️⃣ 연령별 분포 딕셔너리 만들기
+        age_distribution = {
+            "10세 미만": cd_data.population_age_10_under,
+            "10대": cd_data.population_age_10s,
+            "20대": cd_data.population_age_20s,
+            "30대": cd_data.population_age_30s,
+            "40대": cd_data.population_age_40s,
+            "50대": cd_data.population_age_50s,
+            "60세 이상": cd_data.population_age_60_over,
+        }
 
+
+        # 2️⃣ 가장 높은 2개 나이대 찾기
+        sorted_ages = sorted(age_distribution.items(), key=lambda x: x[1], reverse=True)
+        top1, top2 = sorted_ages[0][0], sorted_ages[1][0]
+
+        # 3️⃣ 결과 문자열 생성
         content = f"""
-            
+            - 매장명 : {cd_data.store_name}
+            - 업종 : {cd_data.detail_category_name}
+            - 평균 매출 : {cd_data.loc_info_average_sales_k * 1000 if cd_data.loc_info_average_sales_k is not None else "-"}
+            - 평균 소득 : {cd_data.loc_info_income_won * 10000 if cd_data.loc_info_income_won is not None else "-"}
+            - 평균 소비 : {cd_data.loc_info_average_spend_k * 1000 if cd_data.loc_info_average_spend_k is not None else "-"}
+            - 유동 인구 : {cd_data.loc_info_move_pop_k * 1000 if cd_data.loc_info_move_pop_k is not None else "-"}
+            - 직장 인구 : {cd_data.loc_info_work_pop_k * 1000 if cd_data.loc_info_work_pop_k is not None else "-"}
+            - 인구분포 : 가장 많이 분포연령대 1위: {top1}, 2위: {top2}
         """
+
         client = OpenAI(api_key=os.getenv("GPT_KEY"))
 
         completion = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": gpt_content},
+                {"role": "system", "content": gpt_role},
                 {"role": "user", "content": content},
             ],
         )

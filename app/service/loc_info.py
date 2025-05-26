@@ -49,9 +49,6 @@ def select_loc_info_j_score_by_store_business_number(
     try:
         
         local_store_loc_info_data = crud_select_loc_info_j_score_by_store_business_number(store_business_id)
-        print("###################")
-        print(local_store_loc_info_data)
-        print("###################")
         return local_store_loc_info_data
     except HTTPException:
         raise

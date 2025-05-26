@@ -486,6 +486,7 @@ class LocalStoreLocInfoJscoreDataOutput(BaseModel):
 class LocalStoreLocInfoJscoreDataOutputWithGPT(BaseModel):
     local_store_loc_info_j_score_data: LocalStoreLocInfoJscoreData
     loc_info_advice: Optional[str] = None
+    population_advice: Optional[str] = None
 
     class Config:
         from_attributes = True
