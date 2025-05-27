@@ -87,9 +87,37 @@ from app.service.gpt_answer import (
     get_commercial_district_gpt_answer_by_cd_j_score_average as service_get_commercial_district_gpt_answer_by_cd_j_score_average,
     get_store_info_gpt_answer_by_store_info as service_get_store_info_gpt_answer_by_store_info,
 )
+from app.schemas.init import (
+    StoreBusinessNumberModel,
+    UUIDModel
+)
+from app.service.init import (
+    get_or_create_store_uuid as service_get_or_create_store_uuid,
+    get_uuid_store as service_get_uuid_store,
+)
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+
+@router.post("/get/store/uuid", response_model=StoreBusinessNumberModel)
+def get_store_uuid(data:dict):
+    store_id = data["store_business_id"]
+    uuid = service_get_or_create_store_uuid(store_id)
+
+    return {"uuid": uuid}
+
+@router.post("/get/uuid/store", response_model=UUIDModel)
+def get_uuid_store(data:dict):
+    uuid = data["uuid"]
+    print(uuid)
+    store_business_number = service_get_uuid_store(uuid)
+    print(store_business_number)
+    return {"store_business_number": store_business_number}
+
+
+
+
 
 
 @router.get("/store/info/redux", response_model=LocalStoreRedux)
