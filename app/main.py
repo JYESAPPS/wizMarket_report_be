@@ -133,9 +133,8 @@ app = FastAPI()
 # CORS 설정 추가 (Cross-Origin Resource Sharing)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("ALLOWED_ORIGINS", "").split(
-        ","
-    ),  # 환경 변수에서 허용된 오리진 목록 가져오기 (쉼표로 구분)
+    # allow_origins=os.getenv("ALLOWED_ORIGINS", "").split(","),
+    allow_origins=["*"],     # 모든 오리진 허용
     allow_credentials=True,  # 인증 정보 허용
     allow_methods=["*"],  # 모든 HTTP 메서드 허용
     allow_headers=["*"],  # 모든 HTTP 헤더 허용
