@@ -106,7 +106,7 @@ def get_store_uuid(data:dict):
     print(store_id)
     uuid = service_get_or_create_store_uuid(store_id)
     print(uuid)
-    return {"uuid": uuid}
+    return StoreBusinessNumberModel(uuid=uuid)
 
 @router.post("/get/uuid/store", response_model=UUIDModel)
 def get_uuid_store(data:dict):
