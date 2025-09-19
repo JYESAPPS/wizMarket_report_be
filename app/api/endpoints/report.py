@@ -89,7 +89,9 @@ from app.service.gpt_answer import (
 )
 from app.schemas.init import (
     StoreBusinessNumberModel,
-    UUIDModel
+    UUIDModel,
+    StoreUUIDRequest,
+    StoreUUIDResponse
 )
 from app.service.init import (
     get_or_create_store_uuid as service_get_or_create_store_uuid,
@@ -100,13 +102,13 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.post("/get/store/uuid", response_model=StoreBusinessNumberModel)
-def get_store_uuid(data:dict):
-    store_id = data["store_business_id"]
+@router.post("/get/store/uuid", response_model=StoreUUIDResponse)
+def get_store_uuid(body: StoreUUIDRequest):
+    store_id = body.store_business_id
     print(store_id)
     uuid = service_get_or_create_store_uuid(store_id)
     print(uuid)
-    return StoreBusinessNumberModel(uuid=uuid)
+    return StoreUUIDResponse(uuid=uuid)
 
 @router.post("/get/uuid/store", response_model=UUIDModel)
 def get_uuid_store(data:dict):

@@ -10,5 +10,14 @@ from requests.adapters import HTTPAdapter
 class StoreBusinessNumberModel(BaseModel):
     uuid: Optional[str] = None  # INT
     
+class StoreUUIDRequest(BaseModel):
+    store_business_id: str
+
+class StoreUUIDResponse(BaseModel):
+    uuid: str
+
+
+
+
 class UUIDModel(BaseModel):
     store_business_number: Optional[str] = None  # INT
