@@ -7,6 +7,7 @@ from app.db.connect import (
     close_connection,
     close_cursor,
     get_db_connection,
+    get_re_db_connection
 )
 from app.schemas.report import (
     BizDetailCategoryContent,
@@ -21,7 +22,7 @@ def select_local_store_content_by_store_business_number(
 ) -> List[LocalStoreContent]:
 
     try:
-        with get_db_connection() as connection:
+        with get_re_db_connection() as connection:
             with connection.cursor(pymysql.cursors.DictCursor) as cursor:
                 select_query = """
                     SELECT 
