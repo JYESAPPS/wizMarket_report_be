@@ -11,6 +11,7 @@ def get_db_connection():
     try:
         connection = pymysql.connect(
             host=os.getenv("DB_HOST"),
+            port=int(os.getenv("DB_PORT", "3306")),  # 없으면 3306 기본값
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
             database=os.getenv("DB_DATABASE"),

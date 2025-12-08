@@ -6,12 +6,13 @@ from app.db.connect import (
     close_connection,
     close_cursor,
     get_db_connection,
+    get_re_db_connection
 )
 import uuid
 
 
 def get_or_create_store_uuid(store_business_id: str) -> str:
-    conn = get_db_connection()
+    conn = get_re_db_connection()
     cursor = conn.cursor()
 
     try:
