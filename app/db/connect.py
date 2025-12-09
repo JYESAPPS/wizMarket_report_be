@@ -57,7 +57,6 @@ def get_re_db_connection():
     return connection
 
 
-
 def get_report_db_connection(is_dev=False):
     connection = None
     try:

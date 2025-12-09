@@ -86,6 +86,8 @@ from app.service.gpt_answer import (
     get_rising_business_gpt_answer_by_rising_business as service_get_rising_business_gpt_answer_by_rising_business,
     get_commercial_district_gpt_answer_by_cd_j_score_average as service_get_commercial_district_gpt_answer_by_cd_j_score_average,
     get_store_info_gpt_answer_by_store_info as service_get_store_info_gpt_answer_by_store_info,
+    get_daily_operation_tip_gpt_answer as service_get_daily_operation_tip_gpt_answer,
+    get_trend_analysis_gpt_answer as service_get_trend_analysis_gpt_answer,
 )
 from app.schemas.init import (
     StoreBusinessNumberModel,
@@ -101,6 +103,24 @@ from app.service.init import (
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+def _build_store_all_data(store_business_id: str) -> LocalStoreInfoWeaterInfoOutput:
+    local_store_info = service_select_local_store_info_by_store_business_number(
+        store_business_id
+    )
+    weather_data: WeatherInfo = service_get_weather_info_by_lat_lng(
+        local_store_info.latitude, local_store_info.longitude
+    )
+    pm_data: AqiInfo = service_get_pm_info_by_city_name(
+        local_store_info.latitude, local_store_info.longitude
+    )
+    format_current_datetime: str = service_get_currnet_datetime()
+
+    return LocalStoreInfoWeaterInfoOutput(
+        localStoreInfo=local_store_info,
+        weatherInfo=weather_data,
+        aqi_info=pm_data,
+        format_current_datetime=format_current_datetime,
+    )
 
 @router.post("/get/store/uuid", response_model=StoreUUIDResponse)
 def get_store_uuid(body: StoreUUIDRequest):
@@ -153,6 +173,34 @@ async def select_report_store_info_redux(store_business_id: str, request: Reques
         raise HTTPException(status_code=500, detail=error_msg)
 
 
+@router.get("/ai/daily-tip", response_model=GPTAnswer)
+def get_daily_operation_tip(store_business_id: str):
+    try:
+        store_all_data = _build_store_all_data(store_business_id)
+        return service_get_daily_operation_tip_gpt_answer(store_all_data)
+    except HTTPException as http_ex:
+        logger.error(f"HTTP error occurred: {http_ex.detail}")
+        raise http_ex
+    except Exception as e:
+        error_msg = f"Unexpected error while processing request: {str(e)}"
+        logger.error(error_msg)
+        raise HTTPException(status_code=500, detail=error_msg)
+
+
+@router.get("/ai/trend-advice", response_model=GPTAnswer)
+def get_trend_analysis_tip(store_business_id: str):
+    try:
+        store_all_data = _build_store_all_data(store_business_id)
+        return service_get_trend_analysis_gpt_answer(store_all_data)
+    except HTTPException as http_ex:
+        logger.error(f"HTTP error occurred: {http_ex.detail}")
+        raise http_ex
+    except Exception as e:
+        error_msg = f"Unexpected error while processing request: {str(e)}"
+        logger.error(error_msg)
+        raise HTTPException(status_code=500, detail=error_msg)
+
+
 # 기본 정보 + 장사지수 + 날씨 + 미세먼지 + GPT
 @router.get("/store/info", response_model=LocalStoreInfoWeaterInfoOutput)
 def select_report_store_info(store_business_id: str):
@@ -165,33 +213,7 @@ def select_report_store_info(store_business_id: str):
         #     f"Successfully retrieved store info for business ID: {store_business_id}"
         # )
 
-        local_store_info = service_select_local_store_info_by_store_business_number(
-            store_business_id
-        )
-
-        # logger.info(f"local_store_info{local_store_info}")
-        # logger.info(f"local_store_info.latitude{local_store_info.latitude}")
-        # logger.info(f"local_store_info.longitude{local_store_info.longitude}")
-
-        weather_data: WeatherInfo = service_get_weather_info_by_lat_lng(
-            local_store_info.latitude, local_store_info.longitude
-        )
-
-        # logger.info(f"weather_data: {weather_data}")
-
-        pm_data: AqiInfo = service_get_pm_info_by_city_name(
-            local_store_info.latitude, local_store_info.longitude
-        )
-        # logger.info(f"pm_data: {pm_data}")
-
-        format_current_datetime: str = service_get_currnet_datetime()
-
-        store_all_data = LocalStoreInfoWeaterInfoOutput(
-            localStoreInfo=local_store_info,
-            weatherInfo=weather_data,
-            aqi_info=pm_data,
-            format_current_datetime=format_current_datetime,
-        )
+        store_all_data = _build_store_all_data(store_business_id)
 
         # GPT ###########################################################################
         store_advice: GPTAnswer = service_get_store_info_gpt_answer_by_store_info(
@@ -219,12 +241,11 @@ def select_report_store_info(store_business_id: str):
                                 """
 
         result = LocalStoreInfoWeaterInfoOutput(
-            localStoreInfo=local_store_info,
-            weatherInfo=weather_data,
-            aqi_info=pm_data,
-            format_current_datetime=format_current_datetime,
+            localStoreInfo=store_all_data.localStoreInfo,
+            weatherInfo=store_all_data.weatherInfo,
+            aqi_info=store_all_data.aqi_info,
+            format_current_datetime=store_all_data.format_current_datetime,
             store_info_advice=store_advice.gpt_answer,  # GPT
-            # store_info_advice=store_advice_dummy,  # Dummy
         )
         return result
 

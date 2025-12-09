@@ -207,6 +207,157 @@ def get_store_info_gpt_answer_by_store_info(
         )
 
 
+def get_daily_operation_tip_gpt_answer(
+    store_all_data: LocalStoreInfoWeaterInfoOutput,
+) -> GPTAnswer:
+    try:
+        current_date = datetime.now()
+        weekday_map = {
+            0: "월요일",
+            1: "화요일",
+            2: "수요일",
+            3: "목요일",
+            4: "금요일",
+            5: "토요일",
+            6: "일요일",
+        }
+        weekday_name = weekday_map[current_date.weekday()]
+        formatted_date = current_date.strftime("%Y-%m-%d")
+
+        holidays = {
+            (1, 1): "신정",
+            (3, 1): "삼일절",
+            (5, 5): "어린이날",
+            (6, 6): "현충일",
+            (8, 15): "광복절",
+            (10, 3): "개천절",
+            (10, 9): "한글날",
+            (12, 25): "성탄절",
+        }
+        holiday_instruction = ""
+        holiday_name = holidays.get((current_date.month, current_date.day))
+        if holiday_name:
+            holiday_instruction = f"- 오늘은 대한민국의 {holiday_name}이므로 기념일 분위기를 살린 운영 전략을 먼저 제시해주세요.\n"
+
+        local_info = store_all_data.localStoreInfo
+        weather = store_all_data.weatherInfo
+        pm = store_all_data.aqi_info
+
+        best_weekday = local_info.commercial_district_max_weekday or ""
+        same_weekday_instruction = ""
+        if best_weekday and best_weekday == weekday_name:
+            same_weekday_instruction = "- 오늘 요일이 가장 매출이 높은 요일과 같으므로, 혼잡한 상황에서 효율적으로 대응할 팁을 포함해주세요.\n"
+
+        best_time = local_info.commercial_district_max_time or "-"
+        main_client = local_info.commercial_district_max_clinet or "-"
+
+        content = f"""
+당신은 매장 운영 전문 컨설턴트입니다.
+당신의 역할은 매장운영이 잘 되는 주요 측면을 식별하고, 아래 매장 데이터의 맥락을 기반으로 운영 지침과 장사에 대한 통찰력을 제공하는 것입니다.
+주어진 데이터를 분석하여 아래 양식으로 오늘의 매장운영팁을 작성해주세요.
+
+- 매장 데이터 :
+  · 오늘 날씨 : {weather.main}, 기온 {weather.temp}도, 미세먼지 {pm.description}(등급 {pm.aqi})
+  · 조회 요일/날짜 : {weekday_name}, {formatted_date}
+  · 업종 : {local_info.detail_category_name}
+  · 매장주소 : {local_info.city_name} {local_info.district_name} {local_info.sub_district_name}
+  · 매장명 : {local_info.store_name}
+  · 가장 매출이 높은 요일 : {best_weekday or "-"}
+  · 가장 매출이 높은 시간대 : {best_time}
+  · 주요 고객 : {main_client}
+
+- 분석 조건 :
+  1. 오늘 날짜가 대한민국 기념일이라면 기념일을 우선시하여 매장운영 조언을 해주세요. {holiday_instruction.strip() if holiday_instruction else ""}
+  2. 오늘 요일이 가장 매출이 높은 요일과 같다면 손님이 많은 상황에서의 대응 전략을 포함하고, 가장 매출이 높은 시간대와 현재 날씨/기온을 반영한 조언을 해주세요. {same_weekday_instruction.strip() if same_weekday_instruction else ""}
+  3. 지역별 특성을 고려하여 지역별 조언을 강조해주세요.
+  4. 서술형의 자연스러운 대화체로 모바일 기준 8줄 이상, 10줄 이하로 작성해주세요.
+  5. 인삿말을 하지 마세요. 기념일 일때만 기념일관련 언급을 해주세요.
+"""
+        client = OpenAI(api_key=os.getenv("GPT_KEY"))
+        completion = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "당신은 매장 운영 전문가입니다."},
+                {"role": "user", "content": content},
+            ],
+        )
+        report = completion.choices[0].message.content
+        return GPTAnswer(gpt_answer=report)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Service DailyOperationTip Error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Service get_daily_operation_tip_gpt_answer Error: {str(e)}",
+        )
+
+
+def get_trend_analysis_gpt_answer(
+    store_all_data: LocalStoreInfoWeaterInfoOutput,
+) -> GPTAnswer:
+    try:
+        current_date = datetime.now()
+        weekday_map = {
+            0: "월요일",
+            1: "화요일",
+            2: "수요일",
+            3: "목요일",
+            4: "금요일",
+            5: "토요일",
+            6: "일요일",
+        }
+        weekday_name = weekday_map[current_date.weekday()]
+        query_month = current_date.strftime("%Y년 %m월")
+
+        local_info = store_all_data.localStoreInfo
+        best_weekday = local_info.commercial_district_max_weekday or "-"
+        best_time = local_info.commercial_district_max_time or "-"
+        main_client = local_info.commercial_district_max_clinet or "-"
+
+        content = f"""
+당신은 매장 운영 전문 컨설턴트입니다.
+조회 날짜를 기준으로 업종 트렌드를 분석하고 점주에게 조언을 제공해주세요.
+
+ㅇ 매장 데이터 :
+- 업종 : {local_info.detail_category_name}
+- 매장명 : {local_info.store_name}
+- 매장주소 : {local_info.city_name} {local_info.district_name} {local_info.sub_district_name}
+- 주요 고객 : {main_client}
+- 가장 매출이 높은 요일 : {best_weekday}
+- 가장 매출이 높은 시간대 : {best_time}
+- 조회 요일 : {weekday_name}
+- 조회한 달 : {query_month}
+
+ㅇ 분석 조건 :
+- 업종별 트렌드는 계절, 연도, 지역 특성을 고려하여 분석해주세요.
+- 오늘 요일이 가장 매출이 높은 요일과 같다면 그 상황을 반영한 조언을 포함해주세요.
+- 가장 매출이 높은 시간대, 주요 고객, 지역 특성도 반영해주세요.
+- 서술형의 친근한 컨설턴트 말투로 모바일 기준 5줄 이상 길이로 작성하고, '분석'과 '조언'을 구분해 주세요. (예: 분석: ... / 조언: ...)
+- 인삿말을 하지 마세요. 기념일 일때만 기념일관련 언급을 해주세요.
+"""
+        client = OpenAI(api_key=os.getenv("GPT_KEY"))
+        completion = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "당신은 매장 운영 트렌드 분석 전문가입니다."},
+                {"role": "user", "content": content},
+            ],
+        )
+        report = completion.choices[0].message.content
+        return GPTAnswer(gpt_answer=report)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Service TrendAnalysis Error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Service get_trend_analysis_gpt_answer Error: {str(e)}",
+        )
+
+
 # 뜨는 메뉴 GPT Prompt
 def get_rising_business_gpt_answer_by_local_store_top5_menu(
     rising_menu_top5: LocalStoreTop5Menu,
