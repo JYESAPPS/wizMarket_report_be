@@ -267,11 +267,11 @@ def get_daily_operation_tip_gpt_answer(
   · 주요 고객 : {main_client}
 
 - 분석 조건 :
-  1. 오늘 날짜가 대한민국 기념일이라면 기념일을 우선시하여 매장운영 조언을 해주세요. {holiday_instruction.strip() if holiday_instruction else ""}
+  1. 오늘 날짜가 대한민국 기념일이라면 기념일을 우선시하여 매장운영 조언을 해주세요. 기념일이 아니라면, "기념일" 단어를 사용하지 마세요. {holiday_instruction.strip() if holiday_instruction else ""}
   2. 오늘 요일이 가장 매출이 높은 요일과 같다면 손님이 많은 상황에서의 대응 전략을 포함하고, 가장 매출이 높은 시간대와 현재 날씨/기온을 반영한 조언을 해주세요. {same_weekday_instruction.strip() if same_weekday_instruction else ""}
   3. 지역별 특성을 고려하여 지역별 조언을 강조해주세요.
   4. 서술형의 자연스러운 대화체로 모바일 기준 8줄 이상, 10줄 이하로 작성해주세요.
-  5. 인삿말을 하지 마세요. 기념일 일때만 기념일관련 언급을 해주세요.
+  5. 인삿말을 하지 마세요.
 """
         client = OpenAI(api_key=os.getenv("GPT_KEY"))
         completion = client.chat.completions.create(
@@ -328,9 +328,9 @@ def get_trend_analysis_gpt_answer(
 - 가장 매출이 높은 요일 : {best_weekday}
 - 가장 매출이 높은 시간대 : {best_time}
 - 조회 요일 : {weekday_name}
-- 조회한 달 : {query_month}
+- 조회한 달 : {query_month}          
 
-ㅇ 분석 조건 :
+ㅇ 분석 조건 :  
 - 업종별 트렌드는 계절, 연도, 지역 특성을 고려하여 분석해주세요.
 - 오늘 요일이 가장 매출이 높은 요일과 같다면 그 상황을 반영한 조언을 포함해주세요.
 - 가장 매출이 높은 시간대, 주요 고객, 지역 특성도 반영해주세요.
